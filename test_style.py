@@ -42,11 +42,13 @@ def main():
     )
 
     suffix = "lora" if args.lora_path else "base"
-    out_path = out_dir / f"{stem}_sd15_{suffix}.png"
-    result["image"].save(out_path)
+    result["image"].save(out_dir / f"{stem}_pixel.png")        # 최종 픽셀아트
+    result["image_chibi"].save(out_dir / f"{stem}_chibi.png")  # 픽셀화 전 치비
     result["source_image"].save(out_dir / f"{stem}_source.png")
     result["canny_image"].save(out_dir / f"{stem}_canny.png")
-    print(f"saved → {out_path}")
+    print(f"픽셀아트 → {stem}_pixel.png")
+    print(f"치비(전단계) → {stem}_chibi.png")
+    print(f"프롬프트: {result.get('prompt_used', 'N/A')}")
     print(f"rembg_ok: {result['rembg_ok']}")
 
 

@@ -127,6 +127,29 @@ class Mongle32BitPipeline:
         canny = self.extract_canny(source, canny_low, canny_high)
         return source, canny, rembg_ok
 
+    @staticmethod
+    def to_pixel_art(
+        image: Image.Image,
+        pixel_size: int = 96,
+        n_colors: int = 20,
+    ) -> Image.Image:
+        """
+        치비 이미지 → 픽셀아트 변환
+        pixel_size: 중간 해상도 (낮을수록 픽셀이 굵어짐, 권장 64~128)
+        n_colors: 색상 팔레트 수 (낮을수록 단순, 권장 16~32)
+        """
+        w, h = image.size
+
+        # 핵심: 색상 팔레트 제한 (이게 없으면 그냥 블러처럼 보임)
+        quantized = image.quantize(colors=n_colors, method=Image.Quantize.MEDIANCUT)
+        rgb = quantized.convert("RGB")
+
+        # 다운스케일 → 업스케일 (NEAREST = 픽셀 블록감)
+        small = rgb.resize((pixel_size, pixel_size), Image.NEAREST)
+        result = small.resize((w, h), Image.NEAREST)
+
+        return result
+
     def build_prompt(self, source: Image.Image) -> str:
         if self.vlm is not None:
             description = self.vlm.describe(source)
@@ -167,8 +190,12 @@ class Mongle32BitPipeline:
 
         result_cleaned = self.remove_background(result)
 
+        # 픽셀아트 후처리: 색상 팔레트 제한 + 픽셀화
+        pixel_art = self.to_pixel_art(result_cleaned)
+
         return {
-            "image": result_cleaned,
+            "image": pixel_art,
+            "image_chibi": result_cleaned,
             "image_raw": result,
             "source_image": source,
             "canny_image": canny,
