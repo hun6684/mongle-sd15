@@ -17,17 +17,17 @@ def main():
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", default="outputs/style_test")
     parser.add_argument("--steps", type=int, default=30)
-    parser.add_argument("--strength", type=float, default=0.6)
     parser.add_argument("--controlnet-scale", type=float, default=0.8)
-    parser.add_argument("--guidance-scale", type=float, default=7.5)
+    parser.add_argument("--guidance-scale", type=float, default=9.0)
     parser.add_argument("--lora-path", default=None, help="LoRA 경로. 없으면 base 모델만 사용.")
+    parser.add_argument("--no-vlm", action="store_true", help="VLM 없이 실행")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    pipe = load_pipeline(lora_path=args.lora_path)
+    pipe = load_pipeline(lora_path=args.lora_path, use_vlm=not args.no_vlm)
 
     image = Image.open(args.input).convert("RGB")
     stem = Path(args.input).stem
@@ -39,7 +39,6 @@ def main():
         num_inference_steps=args.steps,
         guidance_scale=args.guidance_scale,
         controlnet_conditioning_scale=args.controlnet_scale,
-        strength=args.strength,
         seed=args.seed,
     )
 
