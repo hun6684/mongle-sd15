@@ -20,14 +20,14 @@ def main():
     parser.add_argument("--strength", type=float, default=0.6)
     parser.add_argument("--controlnet-scale", type=float, default=0.8)
     parser.add_argument("--guidance-scale", type=float, default=7.5)
+    parser.add_argument("--lora-path", default=None, help="LoRA 경로. 없으면 base 모델만 사용.")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # lora_path=None → base model only
-    pipe = load_pipeline(lora_path=None)
+    pipe = load_pipeline(lora_path=args.lora_path)
 
     image = Image.open(args.input).convert("RGB")
     stem = Path(args.input).stem
@@ -43,7 +43,8 @@ def main():
         seed=args.seed,
     )
 
-    out_path = out_dir / f"{stem}_sd15_base.png"
+    suffix = "lora" if args.lora_path else "base"
+    out_path = out_dir / f"{stem}_sd15_{suffix}.png"
     result["image"].save(out_path)
     result["source_image"].save(out_dir / f"{stem}_source.png")
     result["canny_image"].save(out_dir / f"{stem}_canny.png")
