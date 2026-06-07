@@ -9,7 +9,7 @@ Usage:
 import argparse
 from pathlib import Path
 from PIL import Image
-from pipeline import load_pipeline, DEFAULT_PROMPT, DEFAULT_NEGATIVE_PROMPT
+from pipeline import load_pipeline, DEFAULT_NEGATIVE_PROMPT
 
 
 def main():
@@ -34,7 +34,6 @@ def main():
 
     result = pipe(
         image,
-        prompt=DEFAULT_PROMPT,
         negative_prompt=DEFAULT_NEGATIVE_PROMPT,
         num_inference_steps=args.steps,
         guidance_scale=args.guidance_scale,
