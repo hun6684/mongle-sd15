@@ -130,8 +130,12 @@ class Mongle32BitPipeline:
             generator=generator,
         ).images[0]
 
+        # 생성된 output에 rembg 재적용 → 배경 날아다니는 픽셀 제거
+        result_cleaned = self.remove_background(result)
+
         return {
-            "image": result,
+            "image": result_cleaned,
+            "image_raw": result,
             "source_image": source,
             "canny_image": canny,
             "rembg_ok": rembg_ok,
